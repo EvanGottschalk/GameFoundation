@@ -2,7 +2,10 @@
   "permissions": {
     "allow": [
       "Bash(npm install *)",
-      "Bash(npx tsc *)"
+      "Bash(npx tsc *)",
+      "Bash(curl -s -o NUL -w \"HTTP %{http_code}\\\\n\" http://localhost:3000/)",
+      "Bash(node -e \"try{require.resolve\\('playwright'\\);console.log\\('playwright present'\\)}catch\\(e\\){console.log\\('no playwright'\\)}\")",
+      "Bash(node -e \"try{require.resolve\\('puppeteer'\\);console.log\\('puppeteer present'\\)}catch\\(e\\){console.log\\('no puppeteer'\\)}\")"
     ]
   }
 }

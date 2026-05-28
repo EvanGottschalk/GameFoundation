@@ -26,9 +26,9 @@ const player = {
     jumpBuffer: 100,      // ms before landing that an early jump input is accepted
   },
 
-  effects: {
-    shine: 'Black Streak',
-  },
+  effects: [
+    {shine: 'Black Streak'},
+  ],
 
   animations: {
     idle: {

@@ -2,6 +2,8 @@ import Phaser from "phaser";
 import globalConfig from "../../config/global";
 import playerConfig from "../../config/player";
 import zones from "../../config/zones";
+import shineEffects from "../../config/effects/shine";
+import { ShineEffect } from "../effects/ShineEffect";
 
 const hexToNumber = (hex: string): number => parseInt(hex.replace("#", ""), 16);
 
@@ -25,6 +27,7 @@ export class MainScene extends Phaser.Scene {
   private platforms!: Phaser.Physics.Arcade.StaticGroup;
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   private hasDoubleJumped = false;
+  private effects: ShineEffect[] = [];
 
   constructor() {
     super({ key: "MainScene" });
@@ -77,6 +80,26 @@ export class MainScene extends Phaser.Scene {
 
     this.physics.add.collider(this.playerRect, this.platforms);
 
+    // --- Effects (overlaid on the player, e.g. shine) ---
+    for (const entry of playerConfig.effects) {
+      if ("shine" in entry) {
+        const shineConfig = shineEffects[entry.shine];
+        if (shineConfig) {
+          this.effects.push(
+            new ShineEffect(
+              this,
+              this.playerRect,
+              shineConfig as ConstructorParameters<typeof ShineEffect>[2],
+            ),
+          );
+        } else {
+          console.warn(
+            `Shine effect "${entry.shine}" referenced in player.ts was not found in /config/effects/shine/.`,
+          );
+        }
+      }
+    }
+
     // --- HUD ---
     const textStyle = { fontSize: "13px", color: "#e2e8f0", fontFamily: "monospace" };
     this.add.text(16, 16, `Zone: ${zone.identity.zoneName}`, { ...textStyle, fontSize: "16px" });
@@ -112,6 +135,10 @@ export class MainScene extends Phaser.Scene {
         body.setVelocityY(playerConfig.physics.jumpVelocity * 0.85);
         this.hasDoubleJumped = true;
       }
+    }
+
+    for (const effect of this.effects) {
+      effect.update();
     }
   }
 }

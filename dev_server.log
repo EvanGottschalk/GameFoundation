@@ -1,0 +1,89 @@
+   ▲ Next.js 15.5.15
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.0.129:3000
+
+ ✓ Starting...
+ ✓ Ready in 20.8s
+ ○ Compiling / ...
+ ⚠ ./src/components/PlatformerGame/game/createGame.ts
+Attempted import error: 'phaser' does not contain a default export (imported as 'Phaser').
+
+Import trace for requested module:
+./src/components/PlatformerGame/game/createGame.ts
+./src/components/PlatformerGame/PlatformerGame.tsx
+
+./src/components/PlatformerGame/game/createGame.ts
+Attempted import error: 'phaser' does not contain a default export (imported as 'Phaser').
+
+Import trace for requested module:
+./src/components/PlatformerGame/game/createGame.ts
+./src/components/PlatformerGame/PlatformerGame.tsx
+
+./src/components/PlatformerGame/game/createGame.ts
+Attempted import error: 'phaser' does not contain a default export (imported as 'Phaser').
+
+Import trace for requested module:
+./src/components/PlatformerGame/game/createGame.ts
+./src/components/PlatformerGame/PlatformerGame.tsx
+
+./src/components/PlatformerGame/game/createGame.ts
+Attempted import error: 'phaser' does not contain a default export (imported as 'Phaser').
+
+Import trace for requested module:
+./src/components/PlatformerGame/game/createGame.ts
+./src/components/PlatformerGame/PlatformerGame.tsx
+
+./src/components/PlatformerGame/game/effects/ShineEffect.ts
+Attempted import error: 'phaser' does not contain a default export (imported as 'Phaser').
+
+Import trace for requested module:
+./src/components/PlatformerGame/game/effects/ShineEffect.ts
+./src/components/PlatformerGame/game/scenes/MainScene.ts
+./src/components/PlatformerGame/game/createGame.ts
+./src/components/PlatformerGame/PlatformerGame.tsx
+
+./src/components/PlatformerGame/game/effects/ShineEffect.ts
+Attempted import error: 'phaser' does not contain a default export (imported as 'Phaser').
+
+Import trace for requested module:
+./src/components/PlatformerGame/game/effects/ShineEffect.ts
+./src/components/PlatformerGame/game/scenes/MainScene.ts
+./src/components/PlatformerGame/game/createGame.ts
+./src/components/PlatformerGame/PlatformerGame.tsx
+
+./src/components/PlatformerGame/game/effects/ShineEffect.ts
+Attempted import error: 'phaser' does not contain a default export (imported as 'Phaser').
+
+Import trace for requested module:
+./src/components/PlatformerGame/game/effects/ShineEffect.ts
+./src/components/PlatformerGame/game/scenes/MainScene.ts
+./src/components/PlatformerGame/game/createGame.ts
+./src/components/PlatformerGame/PlatformerGame.tsx
+
+./src/components/PlatformerGame/game/effects/ShineEffect.ts
+Attempted import error: 'phaser' does not contain a default export (imported as 'Phaser').
+
+Import trace for requested module:
+./src/components/PlatformerGame/game/effects/ShineEffect.ts
+./src/components/PlatformerGame/game/scenes/MainScene.ts
+./src/components/PlatformerGame/game/createGame.ts
+./src/components/PlatformerGame/PlatformerGame.tsx
+
+./src/components/PlatformerGame/game/scenes/MainScene.ts
+Attempted import error: 'phaser' does not contain a default export (imported as 'Phaser').
+
+Import trace for requested module:
+./src/components/PlatformerGame/game/scenes/MainScene.ts
+./src/components/PlatformerGame/game/createGame.ts
+./src/components/PlatformerGame/PlatformerGame.tsx
+
+./src/components/PlatformerGame/game/scenes/MainScene.ts
+Attempted import error: 'phaser' does not contain a default export (imported as 'Phaser').
+
+Import trace for requested module:
+./src/components/PlatformerGame/game/scenes/MainScene.ts
+./src/components/PlatformerGame/game/createGame.ts
+./src/components/PlatformerGame/PlatformerGame.tsx
+ GET / 200 in 16894ms
+ GET / 200 in 173ms
+[?25h
