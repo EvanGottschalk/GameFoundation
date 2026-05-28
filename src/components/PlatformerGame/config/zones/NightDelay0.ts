@@ -2,19 +2,12 @@
 
 const zone_overworld = {
   identity: {
-    zoneName: "Overworld",
+    zoneName: "NightDelay0",
     zoneType: "outdoor", // "outdoor" | "indoor" | "dungeon"
     description: "A wide sunlit landscape connecting the village, dungeon entrance, and forest.",
   },
 
-  tilemap: {
-    tilemapPath: "/assets/tilemaps/overworld.json",    // Tiled JSON export
-    tilesetPath: "/assets/tilesets/overworld_tiles.png", // tileset image
-    tileWidth: 16,    // width of one tile in pixels
-    tileHeight: 16,   // height of one tile in pixels
-    mapWidth: 200,    // map width in tiles
-    mapHeight: 30,    // map height in tiles
-  },
+
 
   playerSpawn: {
     x: 120,           // player spawn X in pixels from the left of the zone
@@ -26,16 +19,16 @@ const zone_overworld = {
     // Simple solid rectangles that act as platforms — used when no tilemap is loaded.
     // Each entry: { x, y } is the center; width/height in pixels; color is a hex string.
     platforms: [
-      { x: 640,  y: 696, width: 1280, height: 48, color: "#3f6212" }, // grassy ground spanning the canvas
-      { x: 280,  y: 540, width: 200,  height: 20, color: "#65a30d" }, // low-left platform
-      { x: 700,  y: 440, width: 260,  height: 20, color: "#65a30d" }, // mid platform
-      { x: 1050, y: 520, width: 180,  height: 20, color: "#65a30d" }, // right platform
-      { x: 500,  y: 340, width: 160,  height: 20, color: "#65a30d" }, // upper-mid platform
+      { x: 640,  y: 696, width: 1280, height: 48, color: "#ffffff" }, // grassy ground spanning the canvas
+      { x: 280,  y: 540, width: 200,  height: 20, color: "#ffffff" }, // low-left platform
+      { x: 700,  y: 440, width: 260,  height: 20, color: "#ffffff" }, // mid platform
+      { x: 1050, y: 520, width: 180,  height: 20, color: "#ffffff" }, // right platform
+      { x: 500,  y: 340, width: 160,  height: 20, color: "#ffffff" }, // upper-mid platform
     ],
   },
 
   appearance: {
-    backgroundColor: "#87ceeb",  // sky blue daytime background
+    backgroundColor: "#000000",  // sky blue daytime background
     parallaxLayers: [
       { imagePath: "/assets/backgrounds/clouds_far.png",   scrollFactor: 0.1 }, // distant clouds
       { imagePath: "/assets/backgrounds/mountains.png",    scrollFactor: 0.3 }, // far mountains

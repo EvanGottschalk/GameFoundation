@@ -9,7 +9,7 @@ const player = {
   },
 
   colors: {
-    primary: "#3b82f6",   // main body color used for programmatic fallback
+    primary: "#ffffff",   // main body color used for programmatic fallback
     outline: "#1e3a5f",   // border/outline drawn around the character
     hitFlash: "#ff4444",  // tint color briefly shown when the player takes damage
   },
@@ -24,6 +24,10 @@ const player = {
     bounceFactor: 0.05,   // elasticity on landing (0 = no bounce, 1 = full bounce)
     coyoteTime: 120,      // ms the player can still jump after walking off a ledge
     jumpBuffer: 100,      // ms before landing that an early jump input is accepted
+  },
+
+  effects: {
+    shine: 'Black Streak',
   },
 
   animations: {

@@ -1,6 +1,10 @@
 // Global gameplay configuration — physics, camera, rewards, timing, difficulty, and UI colors
 
 const global = {
+  world: {
+    startingZone: "NightDelay0", // name of the zone file the player loads into on game start (must match a key in config/zones/index.ts)
+  },
+
   physics: {
     gravity: 980,          // world gravity in pixels/sec² applied to all entities
     bounceFactor: 0.05,    // default elasticity for objects that don't override it

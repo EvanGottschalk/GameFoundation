@@ -16,6 +16,23 @@ const zone_village = {
     mapHeight: 20,
   },
 
+  playerSpawn: {
+    x: 200,           // player walks in from the village square
+    y: 640,
+    facing: "right",
+  },
+
+  geometry: {
+    // Cobblestone street with low wooden rooftops the player can hop across.
+    platforms: [
+      { x: 640, y: 696, width: 1280, height: 48, color: "#a16207" }, // cobblestone main street
+      { x: 320, y: 580, width: 160,  height: 18, color: "#854d0e" }, // first rooftop
+      { x: 560, y: 500, width: 140,  height: 18, color: "#854d0e" }, // taller rooftop
+      { x: 800, y: 580, width: 160,  height: 18, color: "#854d0e" }, // second rooftop
+      { x: 1040, y: 500, width: 140, height: 18, color: "#854d0e" }, // far rooftop
+    ],
+  },
+
   appearance: {
     backgroundColor: "#fef9c3",  // warm afternoon golden-hour sky
     parallaxLayers: [

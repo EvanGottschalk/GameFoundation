@@ -16,6 +16,23 @@ const zone_dungeon = {
     mapHeight: 50,
   },
 
+  playerSpawn: {
+    x: 80,            // dungeon entrance — player spawns just inside the doorway
+    y: 640,
+    facing: "right",
+  },
+
+  geometry: {
+    // Stone platforms creating a winding underground path.
+    platforms: [
+      { x: 640,  y: 696, width: 1280, height: 48, color: "#1f2937" }, // dark stone floor
+      { x: 240,  y: 560, width: 180,  height: 20, color: "#374151" }, // first ledge
+      { x: 520,  y: 480, width: 160,  height: 20, color: "#374151" }, // step up
+      { x: 800,  y: 400, width: 200,  height: 20, color: "#374151" }, // mid bridge
+      { x: 1100, y: 320, width: 140,  height: 20, color: "#374151" }, // high ledge
+    ],
+  },
+
   appearance: {
     backgroundColor: "#0d0d1a",  // near-black underground ambiance
     parallaxLayers: [
