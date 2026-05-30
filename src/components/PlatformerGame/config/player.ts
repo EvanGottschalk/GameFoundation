@@ -27,7 +27,7 @@ const player = {
   },
 
   effects: [
-    {shine: 'Black Streak'},
+    {shine: 'Rolling Rainbow'},
   ],
 
   animations: {

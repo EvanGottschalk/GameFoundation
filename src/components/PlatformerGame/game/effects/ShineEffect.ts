@@ -1,21 +1,34 @@
 import Phaser from "phaser";
 
-// Renders a "shine" effect: one or more colored bands ("waves") that periodically sweep across a target
-// game object and fade out. A wave always traverses the full asset; `effect.width / wave.speed` sets how
-// long one sweep takes (so width/speed are a "functional" travel length), while a wave's `width`, `feather*`
-// and `height` are literal pixels. See docs/dev_notes/effects/shine.md.
+// Renders a "shine" effect: one or more colored bands ("waves") laid out in a pattern that scrolls past
+// the target asset (the asset is a literal-pixel window onto the pattern). The same pattern is rendered
+// identically on any asset size — the asset just shows a different-sized window.
+//
+// Each wave sits at `start` px and is `width` px thick. The pattern scrolls at `speed` px/sec. The cycle
+// length is `max(effect.width, speed * period)` px:
+//   • `effect.width / speed` is the time it takes a wave to traverse the active region — the "animation
+//     duration." `effect.width` sets the minimum cycle, so changing it stretches or shrinks the cycle.
+//   • `speed * period` lets `period` extend the cycle beyond the animation duration, appending blank.
+// Whichever is larger wins. Any span in the cycle not covered by a wave just scrolls past as blank —
+// gaps between waves AND the leftover "empty time" are handled identically (no on/off snap).
+//
+// e.g. Rolling Rainbow's 7 waves (width 100 at 0,100,...,600, speed 100, period 7, effect.width 700) wrap
+// every max(700, 700) = 700 px and fill 700 exactly, so the rainbow rolls with no gaps. Double `period`
+// to 14 → cycle becomes max(700, 1400) = 1400 px = 7s of rainbow + 7s of blank. Double `effect.width` to
+// 1400 instead → also a 14s cycle, but now driven by the active region rather than period.
+// See docs/dev_notes/effects/shine.md.
 
 type Orientation = "horizontal" | "vertical" | "radial";
 
 interface ResolvedWave {
   color: number; // 0xRRGGBB
   opacity: number;
-  start: number; // seconds before the wave first appears
-  speed: number; // design px / second
-  width: number; // design px — band thickness along the travel axis
-  featherStart: number; // design px — alpha ramp at the trailing edge
-  featherEnd: number; // design px — alpha ramp at the leading edge
-  period: number; // seconds between sweeps
+  start: number; // px — the wave's position within the pattern
+  speed: number; // px / second the pattern scrolls
+  width: number; // px — band thickness along the travel axis
+  featherStart: number; // px — alpha ramp at the trailing edge
+  featherEnd: number; // px — alpha ramp at the leading edge
+  period: number; // seconds — cycle is at least this long (extends the cycle past the active region)
   orientation: Orientation;
   reverseDirection: boolean;
   angle: number; // degrees of skew (0 = perpendicular to travel)
@@ -23,8 +36,8 @@ interface ResolvedWave {
 
 interface ShineConfig {
   name: string;
-  width: number; // design px — travel length
-  height: number; // design px — 0 = cover the full asset across the band
+  width: number; // px — active-region width; the cycle is at least this many pixels wide
+  height: number; // px — 0 = cover the full asset across the band
   waveDefaults: Record<string, unknown>;
   waves?: ReadonlyArray<Record<string, unknown>>;
 }
@@ -99,29 +112,33 @@ export class ShineEffect {
 
     this.overlay.clear();
     for (const wave of this.waves) {
-      const progress = this.waveProgress(wave, elapsed);
-      if (progress === null) continue;
       if (wave.orientation === "radial") {
-        this.drawRadial(wave, progress, b);
+        this.drawRadial(wave, elapsed, b);
       } else {
-        this.drawLinear(wave, progress, b);
+        this.drawLinear(wave, elapsed, b);
       }
     }
   }
 
-  // Returns the wave's sweep progress in [0, 1), or null if it is idle/not yet started this cycle.
-  private waveProgress(wave: ResolvedWave, elapsed: number): number | null {
-    const te = elapsed - wave.start;
-    if (te < 0 || wave.speed <= 0) return null;
-    const duration = this.config.width / wave.speed;
-    if (duration <= 0) return null;
-    const phase = te % wave.period;
-    if (phase >= duration) return null;
-    return phase / duration;
+  // Cycle length in literal px. `effect.width` is the floor (= animation duration × speed); `period` can
+  // extend the cycle by adding blank time past the active region.
+  private cycleLength(wave: ResolvedWave): number {
+    return Math.max(this.config.width, wave.speed * wave.period);
+  }
+
+  // Position of the band's leading edge within the cycle [0, L), at `elapsed`.
+  private scrollPosition(wave: ResolvedWave, elapsed: number, L: number): number {
+    const dir = wave.reverseDirection ? -1 : 1;
+    let pos = (wave.start + dir * wave.speed * elapsed) % L;
+    if (pos < 0) pos += L;
+    return pos;
   }
 
   // Horizontal / vertical bands. Work in an (a, c) frame: `a` = travel axis, `c` = cross axis (0..crossSize).
-  private drawLinear(wave: ResolvedWave, progress: number, b: Phaser.Geom.Rectangle): void {
+  private drawLinear(wave: ResolvedWave, elapsed: number, b: Phaser.Geom.Rectangle): void {
+    const L = this.cycleLength(wave);
+    if (L <= 0) return;
+
     const horizontal = wave.orientation === "horizontal";
     const axisExtent = horizontal ? b.width : b.height;
     const crossSize =
@@ -131,16 +148,12 @@ export class ShineEffect {
           ? b.height
           : b.width;
 
-    const bandPx = wave.width; // literal pixels
-    const half = bandPx / 2;
-    const reach = axisExtent + bandPx; // full enter-and-exit travel across the asset
-    const center = wave.reverseDirection
-      ? axisExtent + half - progress * reach
-      : -half + progress * reach;
-
+    // All wave dimensions are literal pixels; the asset is a window onto the pattern.
     const shift = crossSize * Math.tan((wave.angle * Math.PI) / 180);
+    const band = wave.width;
     const featherStartPx = wave.featherStart;
     const featherEndPx = wave.featherEnd;
+    const pos = this.scrollPosition(wave, elapsed, L);
 
     const mapAC = (a: number, c: number): number[] =>
       horizontal ? [b.x + a, b.y + c] : [b.x + c, b.y + a];
@@ -163,60 +176,71 @@ export class ShineEffect {
       );
     };
 
-    const bandStart = center - half;
+    const drawBand = (s: number): void => {
+      if (featherStartPx <= 0 && featherEndPx <= 0) {
+        drawStrip(s, s + band, wave.opacity);
+        return;
+      }
+      const strips = Math.min(Math.max(Math.round(band), 4), 32);
+      const step = band / strips;
+      for (let i = 0; i < strips; i++) {
+        const u = (i + 0.5) * step; // distance from trailing edge
+        let f = 1;
+        if (featherStartPx > 0) f = Math.min(f, u / featherStartPx);
+        if (featherEndPx > 0) f = Math.min(f, (band - u) / featherEndPx);
+        drawStrip(s + i * step, s + (i + 1) * step, wave.opacity * Math.max(f, 0));
+      }
+    };
 
-    if (featherStartPx <= 0 && featherEndPx <= 0) {
-      drawStrip(bandStart, bandStart + bandPx, wave.opacity);
-      return;
-    }
-
-    // Feathered: split the band along its thickness and ramp alpha at the edges.
-    const strips = Math.min(Math.max(Math.round(bandPx), 4), 32);
-    const step = bandPx / strips;
-    for (let i = 0; i < strips; i++) {
-      const u = (i + 0.5) * step; // distance from trailing edge
-      let f = 1;
-      if (featherStartPx > 0) f = Math.min(f, u / featherStartPx);
-      if (featherEndPx > 0) f = Math.min(f, (bandPx - u) / featherEndPx);
-      drawStrip(bandStart + i * step, bandStart + (i + 1) * step, wave.opacity * Math.max(f, 0));
+    // Tile the band every `L` so it wraps and repeats seamlessly across the asset window [0, axisExtent].
+    // The mask clips anything outside the asset; `margin` keeps skewed/feathered edges from being culled early.
+    const margin = Math.abs(shift) + band;
+    const kMin = Math.floor((-pos - margin) / L);
+    const kMax = Math.ceil((axisExtent - pos + margin) / L);
+    for (let k = kMin; k <= kMax; k++) {
+      drawBand(pos + k * L);
     }
   }
 
-  // Radial bands: concentric rings expanding outward (or inward when reversed). Skew/angle do not apply.
-  private drawRadial(wave: ResolvedWave, progress: number, b: Phaser.Geom.Rectangle): void {
+  // Radial bands: concentric rings scrolling outward (or inward when reversed). Skew/angle do not apply.
+  private drawRadial(wave: ResolvedWave, elapsed: number, b: Phaser.Geom.Rectangle): void {
+    const L = this.cycleLength(wave);
+    if (L <= 0) return;
+
     const cx = b.x + b.width / 2;
     const cy = b.y + b.height / 2;
     const maxRadius = 0.5 * Math.sqrt(b.width * b.width + b.height * b.height);
-
-    const bandPx = wave.width; // literal pixels
-    const half = bandPx / 2;
-    const reach = maxRadius + bandPx;
-    const center = wave.reverseDirection
-      ? maxRadius + half - progress * reach
-      : -half + progress * reach;
-
+    const band = wave.width;
     const featherStartPx = wave.featherStart;
     const featherEndPx = wave.featherEnd;
+    const pos = this.scrollPosition(wave, elapsed, L);
 
-    const drawRing = (radius: number, lineWidth: number, alpha: number): void => {
-      if (radius <= 0 || lineWidth <= 0 || alpha <= 0) return;
-      this.overlay.lineStyle(lineWidth, wave.color, alpha);
-      this.overlay.strokeCircle(cx, cy, radius);
+    const drawRing = (rInner: number, thickness: number, alpha: number): void => {
+      const rCenter = rInner + thickness / 2;
+      if (rCenter <= 0 || thickness <= 0 || alpha <= 0) return;
+      this.overlay.lineStyle(thickness, wave.color, alpha);
+      this.overlay.strokeCircle(cx, cy, rCenter);
     };
 
-    if (featherStartPx <= 0 && featherEndPx <= 0) {
-      drawRing(center, bandPx, wave.opacity);
-      return;
-    }
+    const drawBand = (s: number): void => {
+      if (featherStartPx <= 0 && featherEndPx <= 0) {
+        drawRing(s, band, wave.opacity);
+        return;
+      }
+      const strips = Math.min(Math.max(Math.round(band), 4), 32);
+      const step = band / strips;
+      for (let i = 0; i < strips; i++) {
+        const u = (i + 0.5) * step;
+        let f = 1;
+        if (featherStartPx > 0) f = Math.min(f, u / featherStartPx);
+        if (featherEndPx > 0) f = Math.min(f, (band - u) / featherEndPx);
+        drawRing(s + i * step, step, wave.opacity * Math.max(f, 0));
+      }
+    };
 
-    const strips = Math.min(Math.max(Math.round(bandPx), 4), 32);
-    const step = bandPx / strips;
-    for (let i = 0; i < strips; i++) {
-      const u = (i + 0.5) * step;
-      let f = 1;
-      if (featherStartPx > 0) f = Math.min(f, u / featherStartPx);
-      if (featherEndPx > 0) f = Math.min(f, (bandPx - u) / featherEndPx);
-      drawRing(center - half + u, step, wave.opacity * Math.max(f, 0));
+    const kMax = Math.ceil((maxRadius + band - pos) / L);
+    for (let k = 0; k <= kMax; k++) {
+      drawBand(pos + k * L);
     }
   }
 

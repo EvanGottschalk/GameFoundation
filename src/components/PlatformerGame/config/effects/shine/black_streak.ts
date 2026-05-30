@@ -5,12 +5,12 @@ const effect = {
     waveDefaults: {
         color: '#000000',
         opacity: 1,
-        start: 0, // seconds
-        speed: 500, // pixels per second
+        start: 0, // pixels
+        speed: 300, // pixels per second
         width: 20, // pixels
         featherStart: 0, // pixels
         featherEnd: 0, // pixels
-        period: 5, // seconds
+        period: 3, // seconds
         orientation: 'horizontal', // horizontal is left-to-right; vertical is top-to-bottom; radial is inner circles going outward
         reverseDirection: false, // if true, horizontal is right-to-left; vertical is bottom-to-top; radial is outer circles going inward
         angle: 30, // degrees. 0 is perfectly vertical, 90 is perfectly horizontal
@@ -19,7 +19,7 @@ const effect = {
     //     {
     //         color: '#000000',
     //         opacity: 1,
-    //         start: 0, // seconds
+    //         start: 0, // pixels
     //         speed: 500, // pixels per second
     //         width: 20, // pixels
     //         featherStart: 0, // pixels

@@ -5,8 +5,7 @@ const effect = {
     waveDefaults: {
         color: '',
         opacity: 1,
-        start: 0, // seconds
-        speed: 700, // pixels per second
+        speed: 100, // pixels per second
         width: 100, // pixels
         period: 7, // seconds
         orientation: 'horizontal', // horizontal is left-to-right; vertical is top-to-bottom; radial is inner circles going outward
@@ -16,31 +15,31 @@ const effect = {
     waves: [
         {
             color: '#ff0000',
-            start: 0, // seconds
+            start: 0, // pixels
         },
         {
             color: '#ffa200',
-            start: 1, // seconds
+            start: 100, // pixels
         },
         {
             color: '#f2ff00',
-            start: 2, // seconds
+            start: 200, // pixels
         },
         {
             color: '#1eff00',
-            start: 3, // seconds
+            start: 300, // pixels
         },
         {
             color: '#008cff',
-            start: 4, // seconds
+            start: 400, // pixels
         },
         {
             color: '#1100ff',
-            start: 5, // seconds
+            start: 500, // pixels
         },
         {
             color: '#6f00ff',
-            start: 6, // seconds
+            start: 600, // pixels
         },
     ]
 
