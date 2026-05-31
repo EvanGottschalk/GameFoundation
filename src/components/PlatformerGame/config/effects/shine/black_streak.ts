@@ -13,7 +13,7 @@ const effect = {
         period: 3, // seconds
         orientation: 'horizontal', // horizontal is left-to-right; vertical is top-to-bottom; radial is inner circles going outward
         reverseDirection: false, // if true, horizontal is right-to-left; vertical is bottom-to-top; radial is outer circles going inward
-        angle: 30, // degrees. 0 is perfectly vertical, 90 is perfectly horizontal
+        angle: 0, // degrees. 0 is perfectly vertical, 90 is perfectly horizontal
     },
     // waves: [
     //     {

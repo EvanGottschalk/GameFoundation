@@ -2,9 +2,10 @@
 
 const zone_overworld = {
   identity: {
-    zoneName: "NightDelay0",
-    zoneType: "outdoor", // "outdoor" | "indoor" | "dungeon"
-    description: "A wide sunlit landscape connecting the village, dungeon entrance, and forest.",
+    zoneName: "config_entrance",
+    displayName: "Config Entrance",
+    zoneType: "indoor", // "outdoor" | "indoor" | "dungeon"
+    description: "Entrance to config folder.",
   },
 
 
@@ -26,14 +27,14 @@ const zone_overworld = {
 
   appearance: {
     backgroundColor: "#000000",  // sky blue daytime background
-    parallaxLayers: [
-      { imagePath: "/assets/backgrounds/clouds_far.png",   scrollFactor: 0.1 }, // distant clouds
-      { imagePath: "/assets/backgrounds/mountains.png",    scrollFactor: 0.3 }, // far mountains
-      { imagePath: "/assets/backgrounds/trees_far.png",    scrollFactor: 0.6 }, // distant tree line
-      { imagePath: "/assets/backgrounds/trees_near.png",   scrollFactor: 0.85 }, // near foliage
-    ],
-    ambientLightColor: "#fffde7",  // warm daylight tint
-    ambientLightIntensity: 1,      // full brightness (1 = no darkening)
+    // parallaxLayers: [
+    //   { imagePath: "/assets/backgrounds/clouds_far.png",   scrollFactor: 0.1 }, // distant clouds
+    //   { imagePath: "/assets/backgrounds/mountains.png",    scrollFactor: 0.3 }, // far mountains
+    //   { imagePath: "/assets/backgrounds/trees_far.png",    scrollFactor: 0.6 }, // distant tree line
+    //   { imagePath: "/assets/backgrounds/trees_near.png",   scrollFactor: 0.85 }, // near foliage
+    // ],
+    // ambientLightColor: "#fffde7",  // warm daylight tint
+    // ambientLightIntensity: 1,      // full brightness (1 = no darkening)
   },
 
   physics: {
@@ -43,16 +44,16 @@ const zone_overworld = {
   },
 
   npcs: [
-    { characterName: "npc_villager", x: 320,  y: 400, facing: "right" },
-    { characterName: "npc_merchant", x: 640,  y: 400, facing: "left"  },
-    { characterName: "npc_guard",    x: 960,  y: 400, facing: "right" },
-    { characterName: "npc_guard",    x: 1280, y: 400, facing: "left"  },
+    // { characterName: "npc_villager", x: 320,  y: 400, facing: "right" },
+    // { characterName: "npc_merchant", x: 640,  y: 400, facing: "left"  },
+    // { characterName: "npc_guard",    x: 960,  y: 400, facing: "right" },
+    // { characterName: "npc_guard",    x: 1280, y: 400, facing: "left"  },
   ],
 
   items: [
-    { itemName: "item_coin",          x: 480,  y: 380 },
-    { itemName: "item_coin",          x: 496,  y: 380 },
-    { itemName: "item_health_potion", x: 800,  y: 380 },
+    // { itemName: "item_coin",          x: 480,  y: 380 },
+    // { itemName: "item_coin",          x: 496,  y: 380 },
+    // { itemName: "item_health_potion", x: 800,  y: 380 },
   ],
 
   objects: [
@@ -72,23 +73,23 @@ const zone_overworld = {
     { objectName: "platform_0", x: 1200,  y: 710 },
     { objectName: "platform_0", x: 1300,  y: 710 },
     
-    { objectName: "platform_0", x: 700,  y: 500 },
-    { objectName: "platform_0", x: 900,  y: 300 },
+    // { objectName: "platform_0", x: 700,  y: 500 },
+    // { objectName: "platform_0", x: 900,  y: 300 },
 
-    { objectName: "block_square", x: 300,  y: 300 },
-    { objectName: "block_square", x: 400,  y: 300 },
+    // { objectName: "block_square", x: 300,  y: 300 },
+    // { objectName: "block_square", x: 400,  y: 300 },
   ],
 
   audio: {
-    backgroundMusic: "/assets/audio/music/overworld_theme.ogg", // BGM track
-    ambientSound:    "/assets/audio/ambient/birds_wind.wav",    // looping ambient layer
-    musicLoopStart:  4.2,     // seconds into the track where the loop begins
-    musicVolumeOverride: null, // null = use global music volume
+    // backgroundMusic: "/assets/audio/music/overworld_theme.ogg", // BGM track
+    // ambientSound:    "/assets/audio/ambient/birds_wind.wav",    // looping ambient layer
+    // musicLoopStart:  4.2,     // seconds into the track where the loop begins
+    // musicVolumeOverride: null, // null = use global music volume
   },
 
   transitions: [
-    { toZone: "zone_village",  triggerX: 0,    triggerY: 288, triggerWidth: 16, triggerHeight: 192 }, // left edge → village
-    { toZone: "zone_dungeon",  triggerX: 3168, triggerY: 288, triggerWidth: 16, triggerHeight: 192 }, // right edge → dungeon
+    // { toZone: "zone_village",  triggerX: 0,    triggerY: 288, triggerWidth: 16, triggerHeight: 192 }, // left edge → village
+    // { toZone: "zone_dungeon",  triggerX: 3168, triggerY: 288, triggerWidth: 16, triggerHeight: 192 }, // right edge → dungeon
   ],
 } as const;
 

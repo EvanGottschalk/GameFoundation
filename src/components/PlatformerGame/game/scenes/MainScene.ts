@@ -2,17 +2,28 @@ import Phaser from "phaser";
 import globalConfig from "../../config/global";
 import playerConfig from "../../config/player";
 import zones from "../../config/zones";
+import objects from "../../config/objects";
 import shineEffects from "../../config/effects/shine";
 import { ShineEffect } from "../effects/ShineEffect";
 
 const hexToNumber = (hex: string): number => parseInt(hex.replace("#", ""), 16);
+
+type ZoneObjectEntry = {
+  objectName: string;
+  x: number;
+  y: number;
+  width?: number;
+  height?: number;
+  color?: string;
+  solid?: boolean;
+};
 
 type ZoneConfig = {
   identity: { zoneName: string };
   appearance: { backgroundColor: string };
   playerSpawn: { x: number; y: number };
   geometry: {
-    platforms: ReadonlyArray<{
+    platforms?: ReadonlyArray<{
       x: number;
       y: number;
       width: number;
@@ -20,6 +31,17 @@ type ZoneConfig = {
       color: string;
     }>;
   };
+  objects?: ReadonlyArray<ZoneObjectEntry>;
+};
+
+type EffectEntry = { shine?: string };
+
+type ObjectConfig = {
+  identity: { objectName: string; solid?: boolean };
+  drawing_style: "draw_pixels" | "sprite_sheet";
+  size: { width: number; height: number };
+  colors: Record<string | number, string>;
+  effects?: ReadonlyArray<EffectEntry>;
 };
 
 export class MainScene extends Phaser.Scene {
@@ -52,7 +74,7 @@ export class MainScene extends Phaser.Scene {
 
     // --- Platforms (from zone.geometry.platforms) ---
     this.platforms = this.physics.add.staticGroup();
-    for (const plat of zone.geometry.platforms) {
+    for (const plat of zone.geometry.platforms ?? []) {
       const rect = this.add.rectangle(
         plat.x,
         plat.y,
@@ -62,6 +84,46 @@ export class MainScene extends Phaser.Scene {
       );
       this.physics.add.existing(rect, true);
       this.platforms.add(rect);
+    }
+
+    // --- Objects (from zone.objects, resolved against /config/objects/) ---
+    const objectsRegistry = objects as Record<string, ObjectConfig | undefined>;
+    for (const entry of zone.objects ?? []) {
+      const obj = objectsRegistry[entry.objectName];
+      if (!obj) {
+        console.warn(
+          `Object "${entry.objectName}" referenced in zone "${zone.identity.zoneName}" was not found in /config/objects/.`,
+        );
+        continue;
+      }
+
+      // Zone entry overrides object defaults (per zones/CLAUDE.md hierarchy rule).
+      const width = entry.width ?? obj.size.width;
+      const height = entry.height ?? obj.size.height;
+      const color =
+        entry.color ?? obj.colors[0] ?? obj.colors.primary ?? "#ffffff";
+      const solid = entry.solid ?? obj.identity.solid ?? false;
+
+      if (obj.drawing_style === "draw_pixels") {
+        const rect = this.add.rectangle(
+          entry.x,
+          entry.y,
+          width,
+          height,
+          hexToNumber(color),
+        );
+        if (solid) {
+          this.physics.add.existing(rect, true);
+          this.platforms.add(rect);
+        }
+        this.applyEffects(
+          rect,
+          obj.effects ?? [],
+          `objects/${entry.objectName}.ts`,
+        );
+      } else {
+        // TODO: sprite_sheet drawing style
+      }
     }
 
     // --- Player (appearance from player.ts, position from zone.playerSpawn) ---
@@ -81,24 +143,7 @@ export class MainScene extends Phaser.Scene {
     this.physics.add.collider(this.playerRect, this.platforms);
 
     // --- Effects (overlaid on the player, e.g. shine) ---
-    for (const entry of playerConfig.effects) {
-      if ("shine" in entry) {
-        const shineConfig = shineEffects[entry.shine];
-        if (shineConfig) {
-          this.effects.push(
-            new ShineEffect(
-              this,
-              this.playerRect,
-              shineConfig as ConstructorParameters<typeof ShineEffect>[2],
-            ),
-          );
-        } else {
-          console.warn(
-            `Shine effect "${entry.shine}" referenced in player.ts was not found in /config/effects/shine/.`,
-          );
-        }
-      }
-    }
+    this.applyEffects(this.playerRect, playerConfig.effects, "player.ts");
 
     // --- HUD ---
     const textStyle = { fontSize: "13px", color: "#e2e8f0", fontFamily: "monospace" };
@@ -110,6 +155,32 @@ export class MainScene extends Phaser.Scene {
 
     // --- Input ---
     this.cursors = this.input.keyboard!.createCursorKeys();
+  }
+
+  private applyEffects(
+    target: Phaser.GameObjects.Rectangle,
+    effects: ReadonlyArray<EffectEntry>,
+    source: string,
+  ): void {
+    const registry = shineEffects as Record<string, unknown>;
+    for (const entry of effects) {
+      if (typeof entry.shine === "string") {
+        const shineConfig = registry[entry.shine];
+        if (shineConfig) {
+          this.effects.push(
+            new ShineEffect(
+              this,
+              target,
+              shineConfig as ConstructorParameters<typeof ShineEffect>[2],
+            ),
+          );
+        } else {
+          console.warn(
+            `Shine effect "${entry.shine}" referenced in ${source} was not found in /config/effects/shine/.`,
+          );
+        }
+      }
+    }
   }
 
   update(): void {

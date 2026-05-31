@@ -1,9 +1,17 @@
 // Global gameplay configuration — physics, camera, rewards, timing, difficulty, and UI colors
 
 const global = {
+  gameTypeList: ['platformer', 'adventure', 'RPG'],
+  gameType: 'platformer',
+
   world: {
-    startingZone: "NightDelay0", // name of the zone file the player loads into on game start (must match a key in config/zones/index.ts)
+    startingZone: "Config Entrance", // name of the zone file the player loads into on game start (must match a key in config/zones/index.ts)
   },
+
+  // startingZone: {
+  //   'editor': 'editor_home',
+  //   'game': 'NightDelay0',
+  // },
 
   physics: {
     gravity: 980,          // world gravity in pixels/sec² applied to all entities
