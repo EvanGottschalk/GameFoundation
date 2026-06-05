@@ -2,10 +2,10 @@
 
 const zone = {
   identity: {
-    zoneName: "config_lobby",
-    displayName: "Config Lobby",
+    zoneName: "config_zone0",
+    displayName: "Config Zone 0",
     zoneType: "indoor", // "outdoor" | "indoor" | "dungeon"
-    description: "Lobby for config editor game UI.",
+    description: "Automatic UI for folders and files.",
   },
 
 
