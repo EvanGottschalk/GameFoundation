@@ -3,7 +3,7 @@ import globalConfig from "../../config/global";
 import playerConfig from "../../config/player";
 import zones from "../../config/zones";
 import objects from "../../config/objects";
-import controls from "../../config/controls";
+import { controls as controlsMapping, inputAssignments } from "../../config/controls";
 import actions from "../../config/actions";
 import shineEffects from "../../config/effects/shine";
 import { ShineEffect } from "../effects/ShineEffect";
@@ -49,32 +49,35 @@ type ObjectConfig = {
 type ActionConfig = {
   name?: string;
   action_types: ReadonlyArray<string>;
-  direction?: string;
 };
 
-type ControlsConfig = Record<string, string>;
-
+// One resolved binding. The runtime chain is:
+//   realInput  →  shortName       →  actionName              →  action.action_types
+//   (key/gesture) (controls.ts key)  (controls.ts value =       (action_types drives
+//                                     filename in /actions/)     gameplay dispatch)
 type ControlBinding = {
-  keyName: string;
+  realInput: string;
+  shortName: string;
   actionName: string;
   action: ActionConfig;
   key: Phaser.Input.Keyboard.Key;
 };
 
-// Picks which control scheme in /config/controls/ should be active. Filename keys
-// in the registry are platform names: "desktop", "mobile", etc.
+// Picks which `<platform>_input_assignment.ts` file should be active. Platform keys
+// are the file prefixes registered in /config/controls/index.ts.
 function detectPlatform(): string {
   if (typeof navigator === "undefined") return "desktop";
   return /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) ? "mobile" : "desktop";
 }
 
-// Resolves a control-config key (e.g. "z", "left", "enter") to a Phaser keyboard
-// key code via case-insensitive lookup on Phaser.Input.Keyboard.KeyCodes. Returns
-// null for entries that aren't keyboard keys (e.g. "swipe_up" on mobile.ts), so
-// the keyboard handler can skip them without warning.
-function resolveKeyboardKeyCode(keyName: string): number | null {
+// Resolves a real-input name (e.g. "z", "left", "enter") to a Phaser keyboard key
+// code via case-insensitive lookup on Phaser.Input.Keyboard.KeyCodes. Returns null
+// for inputs that aren't keyboard keys (e.g. "swipe_up", "press_left_of_player"),
+// so the keyboard handler can skip them without warning — a future touch handler
+// can consume them.
+function resolveKeyboardKeyCode(realInput: string): number | null {
   const codes = Phaser.Input.Keyboard.KeyCodes as unknown as Record<string, number>;
-  const code = codes[keyName.toUpperCase()];
+  const code = codes[realInput.toUpperCase()];
   return typeof code === "number" ? code : null;
 }
 
@@ -219,39 +222,41 @@ export class MainScene extends Phaser.Scene {
 
   private buildControlBindings(): ControlBinding[] {
     const platform = detectPlatform();
-    const controlsRegistry = controls as Record<string, ControlsConfig | undefined>;
-    const actionsRegistry = actions as Record<string, ActionConfig | undefined>;
-
-    const scheme = controlsRegistry[platform] ?? controlsRegistry.desktop;
-    if (!scheme) {
+    const assignment = inputAssignments[platform] ?? inputAssignments.desktop;
+    if (!assignment) {
       console.warn(
-        `No controls scheme found for platform "${platform}" in /config/controls/. ` +
-          `Add a file named "${platform}.ts" (or "desktop.ts" as a fallback).`,
+        `No input assignment found for platform "${platform}" in /config/controls/. ` +
+          `Add a file named "${platform}_input_assignment.ts" (or "desktop_input_assignment.ts" as a fallback).`,
       );
       return [];
     }
 
+    const shortNameToAction = controlsMapping as unknown as Record<string, string>;
+    const actionsRegistry = actions as Record<string, ActionConfig | undefined>;
+
     const bindings: ControlBinding[] = [];
-    for (const [keyName, actionName] of Object.entries(scheme)) {
-      if (!actionName) continue; // empty string = intentionally unbound
+    for (const [realInput, shortName] of Object.entries(assignment)) {
+      if (!shortName) continue; // empty string in assignment = intentionally unbound
+
+      const actionName = shortNameToAction[shortName];
+      if (!actionName) {
+        // Short name has no action wired up in controls.ts (empty string or missing). Silent skip.
+        continue;
+      }
 
       const action = actionsRegistry[actionName];
       if (!action) {
         console.warn(
-          `Action "${actionName}" referenced in /config/controls/${platform}.ts ("${keyName}") was not found in /config/actions/.`,
+          `Action "${actionName}" referenced in /config/controls/controls.ts ("${shortName}") was not found in /config/actions/.`,
         );
         continue;
       }
 
-      const keyCode = resolveKeyboardKeyCode(keyName);
-      if (keyCode === null) {
-        // Not a keyboard key — likely a touch gesture (e.g. "swipe_up" on mobile.ts).
-        // The keyboard handler skips it; a future touch handler can consume it.
-        continue;
-      }
+      const keyCode = resolveKeyboardKeyCode(realInput);
+      if (keyCode === null) continue; // not a keyboard key (mobile gesture, etc.)
 
       const key = this.input.keyboard!.addKey(keyCode);
-      bindings.push({ keyName, actionName, action, key });
+      bindings.push({ realInput, shortName, actionName, action, key });
     }
     return bindings;
   }
@@ -259,20 +264,20 @@ export class MainScene extends Phaser.Scene {
   private renderControlsHud(textStyle: Phaser.Types.GameObjects.Text.TextStyle): void {
     if (this.bindings.length === 0) return;
     const summary = this.bindings
-      .map((b) => `${b.keyName}: ${b.action.name ?? b.actionName}`)
+      .map((b) => `${b.realInput}: ${b.action.name ?? b.actionName}`)
       .join("   ");
     this.add.text(16, 40, summary, textStyle);
   }
 
   private collectActiveActions(): {
-    held: ActionConfig[];
-    justPressed: ActionConfig[];
+    held: ControlBinding[];
+    justPressed: ControlBinding[];
   } {
-    const held: ActionConfig[] = [];
-    const justPressed: ActionConfig[] = [];
+    const held: ControlBinding[] = [];
+    const justPressed: ControlBinding[] = [];
     for (const b of this.bindings) {
-      if (b.key.isDown) held.push(b.action);
-      if (Phaser.Input.Keyboard.JustDown(b.key)) justPressed.push(b.action);
+      if (b.key.isDown) held.push(b);
+      if (Phaser.Input.Keyboard.JustDown(b.key)) justPressed.push(b);
     }
     return { held, justPressed };
   }
@@ -287,13 +292,13 @@ export class MainScene extends Phaser.Scene {
 
     const { held, justPressed } = this.collectActiveActions();
 
-    // Horizontal movement: every held action with type "move" contributes its
-    // `direction` ("left" / "right"). Opposing inputs cancel out.
+    // Horizontal movement: every held binding whose action is "movement" votes
+    // on direction via its short name ("left" / "right"). Opposing inputs cancel.
     let moveDir = 0;
-    for (const a of held) {
-      if (!a.action_types.includes("move")) continue;
-      if (a.direction === "left") moveDir -= 1;
-      else if (a.direction === "right") moveDir += 1;
+    for (const b of held) {
+      if (!b.action.action_types.includes("movement")) continue;
+      if (b.shortName === "left") moveDir -= 1;
+      else if (b.shortName === "right") moveDir += 1;
     }
     if (moveDir < 0) {
       body.setVelocityX(-playerConfig.physics.speed);
@@ -303,7 +308,7 @@ export class MainScene extends Phaser.Scene {
       body.setVelocityX(0);
     }
 
-    const jumped = justPressed.some((a) => a.action_types.includes("jump"));
+    const jumped = justPressed.some((b) => b.action.action_types.includes("jump"));
     if (jumped) {
       if (onGround) {
         body.setVelocityY(playerConfig.physics.jumpVelocity);

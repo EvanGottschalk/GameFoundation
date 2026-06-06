@@ -1,6 +1,6 @@
-const action1 = {
+const action_1 = {
     name: "Basic Jump",
     action_types: ['jump'],
 } as const;
 
-export default action1;
+export default action_1;
