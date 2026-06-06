@@ -19,6 +19,10 @@ const object = {
     height: 100,
   },
 
+  shape: {
+    name: 'rectangle',
+  },
+
   sprites: {
     // sheet: "/assets/sprites/objects_sheet.png",
     // frameWidth: 32,

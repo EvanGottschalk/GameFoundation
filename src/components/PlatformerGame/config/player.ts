@@ -95,9 +95,13 @@ const player = {
   },
 
   inventory: {
-    maxSlots: 24,                            // total number of item slots in the inventory
-    startingItems: ["item_coin", "item_health_potion"], // items the player begins with
-    startingCurrency: 10,                    // starting coin count
+    maxSlots: 50,
+    settingsByInventory: [
+      {
+        name: 'inventory_1',
+        maxSlots: 50,
+      }
+    ]
   },
 
   audio: {

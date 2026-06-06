@@ -77,6 +77,10 @@ const zone_overworld = {
 
     { objectName: "block_square", x: 300,  y: 300 },
     { objectName: "block_square", x: 400,  y: 300 },
+    
+    { objectName: "circle_collectible_1", x: 400,  y: 200 },
+    { objectName: "circle_collectible_1", x: 700,  y: 500 },
+    { objectName: "circle_collectible_1", x: 850,  y: 450 },
   ],
 
   audio: {

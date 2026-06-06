@@ -6,14 +6,14 @@ const effect = {
         color: '#000000',
         opacity: 1,
         start: 0, // pixels
-        speed: 300, // pixels per second
-        width: 20, // pixels
-        featherStart: 0, // pixels
-        featherEnd: 0, // pixels
-        period: 3, // seconds
+        speed: 500, // pixels per second
+        width: 40, // pixels
+        featherStart: 18, // pixels
+        featherEnd: 18, // pixels
+        period: 1, // seconds
         orientation: 'horizontal', // horizontal is left-to-right; vertical is top-to-bottom; radial is inner circles going outward
         reverseDirection: false, // if true, horizontal is right-to-left; vertical is bottom-to-top; radial is outer circles going inward
-        angle: 0, // degrees. 0 is perfectly vertical, 90 is perfectly horizontal
+        angle: 30, // degrees. 0 is perfectly vertical, 90 is perfectly horizontal
     },
     // waves: [
     //     {

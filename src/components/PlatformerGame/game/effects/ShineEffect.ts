@@ -42,7 +42,7 @@ interface ShineConfig {
   waves?: ReadonlyArray<Record<string, unknown>>;
 }
 
-type ShineTarget = Phaser.GameObjects.Rectangle;
+type ShineTarget = Phaser.GameObjects.Shape;
 
 const hexToNumber = (hex: string): number => {
   const n = parseInt(hex.replace("#", ""), 16);
@@ -61,21 +61,35 @@ export class ShineEffect {
   private readonly maskGraphics: Phaser.GameObjects.Graphics;
   private readonly startMs: number;
 
-  constructor(scene: Phaser.Scene, target: ShineTarget, config: ShineConfig) {
+  constructor(
+    scene: Phaser.Scene,
+    target: ShineTarget,
+    config: ShineConfig,
+    options: { depth?: number } = {},
+  ) {
     this.scene = scene;
     this.target = target;
     this.config = config;
     this.waves = this.resolveWaves(config);
     this.startMs = scene.time.now;
 
-    // Overlay holds the drawn bands and sits above the target.
+    // Overlay holds the drawn bands and sits above the target. Callers can lift
+    // the depth above HUD containers (e.g. an inventory strip at depth 2000)
+    // so the shine isn't hidden behind them.
     this.overlay = scene.add.graphics();
-    this.overlay.setDepth(1000);
+    this.overlay.setDepth(options.depth ?? 1000);
 
     // A geometry mask clips the bands to the target's bounds. Redrawing maskGraphics each frame moves the clip.
     this.maskGraphics = scene.make.graphics({}, false);
     this.maskGraphics.fillStyle(0xffffff);
     this.overlay.setMask(this.maskGraphics.createGeometryMask());
+  }
+
+  // True until the target has been destroyed (e.g. a collectible picked up, or an
+  // inventory entry torn down on redraw). Callers use this to drop dead effects
+  // from their tick loop so Graphics objects don't accumulate.
+  isActive(): boolean {
+    return this.target.active;
   }
 
   private resolveWaves(config: ShineConfig): ResolvedWave[] {
@@ -102,13 +116,33 @@ export class ShineEffect {
   }
 
   update(): void {
+    // The target may have been destroyed (e.g. a collectible picked up). Stop
+    // rendering and leave the overlay blank — the GameObject's internals (radius,
+    // geom, etc.) are nulled out on destroy, so any further reads would throw.
+    if (!this.target.active) {
+      this.overlay.clear();
+      return;
+    }
+
     const elapsed = (this.scene.time.now - this.startMs) / 1000;
     const b = this.target.getBounds();
 
-    // Move the clip region to track the target.
+    // Move the clip region to track the target. Match the target's geometry so the
+    // bands only show inside the visible asset (rectangle bands would otherwise paint
+    // the bounding-box corners of a circular target).
     this.maskGraphics.clear();
     this.maskGraphics.fillStyle(0xffffff);
-    this.maskGraphics.fillRect(b.x, b.y, b.width, b.height);
+    if (this.target instanceof Phaser.GameObjects.Arc) {
+      // Use bounds (world-space) rather than target.radius (un-scaled, container-
+      // relative) so the mask tracks the target through scale and container moves.
+      this.maskGraphics.fillCircle(
+        b.x + b.width / 2,
+        b.y + b.height / 2,
+        b.width / 2,
+      );
+    } else {
+      this.maskGraphics.fillRect(b.x, b.y, b.width, b.height);
+    }
 
     this.overlay.clear();
     for (const wave of this.waves) {

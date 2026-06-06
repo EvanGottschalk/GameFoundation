@@ -2,25 +2,35 @@
 
 const object = {
   identity: {
-    objectName: "platform_0",
-    displayName: "platform_0",
-    description: "Basic Platform",
-    type: "platform",      // "container" | "door" | "decoration" | "hazard" | "npc_trigger" | "platform"
+    objectName: "circle_collectible_1",
+    displayName: "circle_collectible_1",
+    description: "Collectible Circle",
+    type: "collectible",      // "container" | "door" | "decoration" | "hazard" | "npc_trigger" | "platform"
     // interactable: true,     // player can press interact to open
-    solid: true, // player cannot overlap this object; it is a solid object
+    solid: false, // player cannot overlap this object; it is a solid object
     // interactionPrompt: "Press E to open", // text shown near the object when in range
+  },
+
+  on_player_contact: {
+    animation: '',
+    collect_item: {
+      collectible: true,
+      removeFromScreen: true,
+      animation: '', // specific on_player_contact animations take precedence over the general on_player_contact animation
+      addToList: 'inventory_1',
+    }
   },
 
   drawing_style_options: ['draw_pixels', 'sprite_sheet'],
   drawing_style: 'draw_pixels',
 
   size: {
-    width: 100,
-    height: 20,
+    width: 80,
+    height: 80,
   },
 
   shape: {
-    name: 'rectangle',
+    name: 'circle',
   },
 
   sprites: {
@@ -42,7 +52,7 @@ const object = {
   },
 
   effects: [
-    {shine: 'Rolling Rainbow'},
+    // {shine: 'Black Streak'},
   ],
 
   behavior: {
