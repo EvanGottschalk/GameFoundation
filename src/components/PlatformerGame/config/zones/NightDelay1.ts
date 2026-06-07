@@ -8,11 +8,14 @@ const zone_overworld = {
     description: "A wide sunlit landscape connecting the village, dungeon entrance, and forest.",
   },
 
+  width: 1440,
+  height: 6000,
+
 
 
   playerSpawn: {
-    x: 120,           // player spawn X in pixels from the left of the zone
-    y: 640,           // player spawn Y in pixels from the top of the zone
+    x: 72,           // player spawn X in pixels from the left of the zone
+    y: 36,           // player spawn Y in pixels from the top of the zone
     facing: "right",  // direction the player faces on spawn ("left" or "right")
   },
 
@@ -57,27 +60,24 @@ const zone_overworld = {
   ],
 
   objects: [
-    { objectName: "platform_0", x: 500,  y: 500 },
-    { objectName: "platform_0", x: 0,  y: 710 },
-    { objectName: "platform_0", x: 100,  y: 710 },
-    { objectName: "platform_0", x: 200,  y: 710 },
-    { objectName: "platform_0", x: 300,  y: 710 },
-    { objectName: "platform_0", x: 400,  y: 710 },
-    { objectName: "platform_0", x: 500,  y: 710 },
-    { objectName: "platform_0", x: 600,  y: 710 },
-    { objectName: "platform_0", x: 700,  y: 710 },
-    { objectName: "platform_0", x: 800,  y: 710 },
-    { objectName: "platform_0", x: 900,  y: 710 },
-    { objectName: "platform_0", x: 1000,  y: 710 },
-    { objectName: "platform_0", x: 1100,  y: 710 },
-    { objectName: "platform_0", x: 1200,  y: 710 },
-    { objectName: "platform_0", x: 1300,  y: 710 },
+    { objectName: "block_square", x: 72*0,  y: 288 },
+    { objectName: "block_square", x: 72*1,  y: 288 },
+    { objectName: "block_square", x: 72*2,  y: 288 },
+    { objectName: "block_square", x: 72*3,  y: 288 },
+    { objectName: "block_square", x: 72*4,  y: 288 },
+    { objectName: "block_square", x: 72*5,  y: 288 },
     
-    { objectName: "platform_0", x: 700,  y: 500 },
-    { objectName: "platform_0", x: 900,  y: 300 },
+    
+    { objectName: "block_square", x: 72*9,  y: 72*8 },
+    { objectName: "block_square", x: 72*10,  y: 72*8 },
 
-    { objectName: "block_square", x: 300,  y: 300 },
-    { objectName: "block_square", x: 400,  y: 300 },
+    { objectName: "block_square", x: 72*0,  y: 72*14 },
+    { objectName: "block_square", x: 72*1,  y: 72*14 },
+    { objectName: "block_square", x: 72*2,  y: 72*14 },
+    { objectName: "block_square", x: 72*3,  y: 72*14 },
+    { objectName: "block_square", x: 72*4,  y: 72*14 },
+    { objectName: "block_square", x: 72*5,  y: 72*14 },
+
     
     { objectName: "circle_collectible_1", x: 400,  y: 200 },
     { objectName: "circle_collectible_1", x: 700,  y: 500 },

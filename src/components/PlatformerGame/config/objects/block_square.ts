@@ -15,8 +15,8 @@ const object = {
   drawing_style: 'draw_pixels',
 
   size: {
-    width: 100,
-    height: 100,
+    width: 72,
+    height: 72,
   },
 
   shape: {
@@ -42,7 +42,7 @@ const object = {
   },
 
   effects: [
-    {shine: 'Rolling Rainbow'},
+    {},
   ],
 
   behavior: {

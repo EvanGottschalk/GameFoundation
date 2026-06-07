@@ -5,7 +5,10 @@ const global = {
   gameType: 'platformer',
 
   world: {
-    startingZone: "NightDelay0", // name of the zone file the player loads into on game start (must match a key in config/zones/index.ts)
+    startingZone: "NightDelay1", // name of the zone file the player loads into on game start (must match a key in config/zones/index.ts)
+    mobile: {
+      startingZone: "NightDelay1_mobile", // on mobile, the name of the zone file the player loads into on game start (must match a key in config/zones/index.ts)
+    },
   },
 
   // startingZone: {

@@ -162,8 +162,13 @@ export class MainScene extends Phaser.Scene {
     for (const off of this.inventoryUnsubscribers) off();
     this.inventoryUnsubscribers = [];
 
-    // Resolve which zone to load. The starting zone is configured in global.ts.
-    const zoneName = globalConfig.world.startingZone;
+    // Resolve which zone to load. The starting zone is configured in global.ts,
+    // with a separate mobile override under world.mobile.startingZone.
+    const platform = detectPlatform();
+    const zoneName =
+      platform === "mobile"
+        ? globalConfig.world.mobile.startingZone
+        : globalConfig.world.startingZone;
     const zone = zones[zoneName] as ZoneConfig | undefined;
 
     if (!zone) {

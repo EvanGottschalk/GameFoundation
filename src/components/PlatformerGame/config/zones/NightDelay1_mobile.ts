@@ -3,7 +3,7 @@
 const zone_overworld = {
 
   identity: {
-    zoneName: "NightDelay0",
+    zoneName: "NightDelay0_mobile",
     zoneType: "outdoor", // "outdoor" | "indoor" | "dungeon"
     description: "A wide sunlit landscape connecting the village, dungeon entrance, and forest.",
   },
@@ -44,40 +44,23 @@ const zone_overworld = {
   },
 
   npcs: [
-    // { characterName: "npc_villager", x: 320,  y: 400, facing: "right" },
-    // { characterName: "npc_merchant", x: 640,  y: 400, facing: "left"  },
-    // { characterName: "npc_guard",    x: 960,  y: 400, facing: "right" },
-    // { characterName: "npc_guard",    x: 1280, y: 400, facing: "left"  },
+    { characterName: "npc_villager", x: 320,  y: 400, facing: "right" },
+    { characterName: "npc_merchant", x: 640,  y: 400, facing: "left"  },
+    { characterName: "npc_guard",    x: 960,  y: 400, facing: "right" },
+    { characterName: "npc_guard",    x: 1280, y: 400, facing: "left"  },
   ],
 
   items: [
-    {'name': 'collectible_circle_1'},
-    // { itemName: "item_coin",          x: 496,  y: 380 },
-    // { itemName: "item_health_potion", x: 800,  y: 380 },
+    { itemName: "item_coin",          x: 480,  y: 380 },
+    { itemName: "item_coin",          x: 496,  y: 380 },
+    { itemName: "item_health_potion", x: 800,  y: 380 },
   ],
 
   objects: [
-    { objectName: "platform_0", x: 500,  y: 500 },
-    { objectName: "platform_0", x: 0,  y: 710 },
-    { objectName: "platform_0", x: 100,  y: 710 },
-    { objectName: "platform_0", x: 200,  y: 710 },
-    { objectName: "platform_0", x: 300,  y: 710 },
-    { objectName: "platform_0", x: 400,  y: 710 },
-    { objectName: "platform_0", x: 500,  y: 710 },
-    { objectName: "platform_0", x: 600,  y: 710 },
-    { objectName: "platform_0", x: 700,  y: 710 },
-    { objectName: "platform_0", x: 800,  y: 710 },
-    { objectName: "platform_0", x: 900,  y: 710 },
-    { objectName: "platform_0", x: 1000,  y: 710 },
-    { objectName: "platform_0", x: 1100,  y: 710 },
-    { objectName: "platform_0", x: 1200,  y: 710 },
-    { objectName: "platform_0", x: 1300,  y: 710 },
-    
-    { objectName: "platform_0", x: 700,  y: 500 },
-    { objectName: "platform_0", x: 900,  y: 300 },
-
     { objectName: "block_square", x: 300,  y: 300 },
     { objectName: "block_square", x: 400,  y: 300 },
+    { objectName: "block_square", x: 500,  y: 300 },
+    { objectName: "block_square", x: 600,  y: 300 },
     
     { objectName: "circle_collectible_1", x: 400,  y: 200 },
     { objectName: "circle_collectible_1", x: 700,  y: 500 },

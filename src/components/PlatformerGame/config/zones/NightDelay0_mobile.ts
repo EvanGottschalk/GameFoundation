@@ -3,12 +3,13 @@
 const zone_overworld = {
 
   identity: {
-    zoneName: "NightDelay0",
+    zoneName: "NightDelay0_mobile",
     zoneType: "outdoor", // "outdoor" | "indoor" | "dungeon"
     description: "A wide sunlit landscape connecting the village, dungeon entrance, and forest.",
   },
 
-
+  width: 1080, // width of the area within the game
+  height: 6000, // height of the area within the game
 
   playerSpawn: {
     x: 120,           // player spawn X in pixels from the left of the zone
@@ -52,6 +53,7 @@ const zone_overworld = {
 
   items: [
     {'name': 'collectible_circle_1'},
+    // { itemName: "item_coin",          x: 480,  y: 380 },
     // { itemName: "item_coin",          x: 496,  y: 380 },
     // { itemName: "item_health_potion", x: 800,  y: 380 },
   ],
