@@ -11,10 +11,12 @@ const display = {
     desktop: {
       width: 1440,
       height: 720,
+      scaleToFit: 'height'
     },
     mobile: {
-      width: 'screen width',
-      height: 'screen height',
+      width: 720,
+      height: 1440,
+      scaleToFit: 'width'
     }
   },
 

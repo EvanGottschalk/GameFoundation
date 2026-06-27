@@ -29,6 +29,11 @@ type ZoneObjectEntry = {
 
 type ZoneConfig = {
   identity: { zoneName: string };
+  // Dimensions of the playable area inside the zone, in pixels. May exceed the
+  // display size — the camera scrolls to follow the player across the zone.
+  // Falls back to the display size when omitted.
+  width?: number;
+  height?: number;
   appearance: { backgroundColor: string };
   playerSpawn: { x: number; y: number };
   geometry: {
@@ -183,6 +188,15 @@ export class MainScene extends Phaser.Scene {
     // --- Zone background ---
     this.cameras.main.setBackgroundColor(zone.appearance.backgroundColor);
 
+    // --- Zone bounds ---
+    // Zones may be larger than the visible canvas (e.g. tall vertical levels).
+    // The physics world and camera both get clamped to the zone, so the player
+    // can walk/fall through the entire zone while the camera scrolls to follow.
+    const zoneWidth = zone.width ?? this.scale.width;
+    const zoneHeight = zone.height ?? this.scale.height;
+    this.physics.world.setBounds(0, 0, zoneWidth, zoneHeight);
+    this.cameras.main.setBounds(0, 0, zoneWidth, zoneHeight);
+
     // --- Platforms (from zone.geometry.platforms) ---
     this.platforms = this.physics.add.staticGroup();
     for (const plat of zone.geometry.platforms ?? []) {
@@ -271,6 +285,20 @@ export class MainScene extends Phaser.Scene {
 
     this.physics.add.collider(this.playerRect, this.platforms);
 
+    // --- Camera follow ---
+    // Smoothly track the player as they move through the zone. Lerp/deadzone/zoom
+    // are all read from globalConfig.camera; the bounds were set above so the
+    // camera stops at the zone edges instead of revealing empty space.
+    const cam = globalConfig.camera;
+    this.cameras.main.startFollow(
+      this.playerRect,
+      true,
+      cam.lerpFactor,
+      cam.lerpFactor,
+    );
+    this.cameras.main.setDeadzone(cam.deadzoneWidth, cam.deadzoneHeight);
+    this.cameras.main.setZoom(cam.zoom);
+
     // --- Effects (overlaid on the player, e.g. shine) ---
     this.applyEffects(this.playerRect, playerConfig.effects, "player.ts");
 
@@ -285,11 +313,15 @@ export class MainScene extends Phaser.Scene {
     this.bindings = this.buildControlBindings();
 
     // --- HUD ---
+    // setScrollFactor(0) pins these to the screen so they don't drift with the
+    // camera once it starts following the player.
     const textStyle = { fontSize: "13px", color: "#e2e8f0", fontFamily: "monospace" };
-    this.add.text(16, 16, `Zone: ${zone.identity.zoneName}`, { ...textStyle, fontSize: "16px" });
+    this.add
+      .text(16, 16, `Zone: ${zone.identity.zoneName}`, { ...textStyle, fontSize: "16px" })
+      .setScrollFactor(0);
     this.renderControlsHud(textStyle);
     if (playerConfig.abilities.doubleJump) {
-      this.add.text(16, 58, "(double jump enabled)", textStyle);
+      this.add.text(16, 58, "(double jump enabled)", textStyle).setScrollFactor(0);
     }
 
     // --- Inventory HUD (always visible, redraws whenever the list changes) ---
@@ -409,7 +441,7 @@ export class MainScene extends Phaser.Scene {
     const summary = this.bindings
       .map((b) => `${b.realInput}: ${b.action.name ?? b.actionName}`)
       .join("   ");
-    this.add.text(16, 40, summary, textStyle);
+    this.add.text(16, 40, summary, textStyle).setScrollFactor(0);
   }
 
   // Looks up a menu config by filename key in /config/menus/ and renders each of its

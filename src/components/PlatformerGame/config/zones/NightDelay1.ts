@@ -60,23 +60,33 @@ const zone_overworld = {
   ],
 
   objects: [
-    { objectName: "block_square", x: 72*0,  y: 288 },
-    { objectName: "block_square", x: 72*1,  y: 288 },
-    { objectName: "block_square", x: 72*2,  y: 288 },
-    { objectName: "block_square", x: 72*3,  y: 288 },
-    { objectName: "block_square", x: 72*4,  y: 288 },
-    { objectName: "block_square", x: 72*5,  y: 288 },
+    // #1 Starting platform
+    { objectName: "block_square", x: 72*0 - 36,  y: 288 },
+    { objectName: "block_square", x: 72*1 - 36,  y: 288 },
+    { objectName: "block_square", x: 72*2 - 36,  y: 288 },
+    { objectName: "block_square", x: 72*3 - 36,  y: 288 },
+    { objectName: "block_square", x: 72*4 - 36,  y: 288 },
+    { objectName: "block_square", x: 72*5 - 36,  y: 288 },
     
-    
-    { objectName: "block_square", x: 72*9,  y: 72*8 },
-    { objectName: "block_square", x: 72*10,  y: 72*8 },
+    // #2 Small central platform
+    { objectName: "block_square", x: 72*9 - 36,  y: 72*8 },
+    { objectName: "block_square", x: 72*10 - 36,  y: 72*8 },
 
-    { objectName: "block_square", x: 72*0,  y: 72*14 },
-    { objectName: "block_square", x: 72*1,  y: 72*14 },
-    { objectName: "block_square", x: 72*2,  y: 72*14 },
-    { objectName: "block_square", x: 72*3,  y: 72*14 },
-    { objectName: "block_square", x: 72*4,  y: 72*14 },
-    { objectName: "block_square", x: 72*5,  y: 72*14 },
+    // #3 Right lower platform
+    { objectName: "block_square", x: 72*15 - 36,  y: 72*14 },
+    { objectName: "block_square", x: 72*16 - 36,  y: 72*14 },
+    { objectName: "block_square", x: 72*17 - 36,  y: 72*14 },
+    { objectName: "block_square", x: 72*18 - 36,  y: 72*14 },
+    { objectName: "block_square", x: 72*19 - 36,  y: 72*14 },
+    { objectName: "block_square", x: 72*20 - 36,  y: 72*14 },
+
+    // #4 Sparse steps
+    { objectName: "block_square", x: 72*20 - 36,  y: 72*22 },
+    { objectName: "block_square", x: 72*18 - 36,  y: 72*22 },
+    { objectName: "block_square", x: 72*16 - 36,  y: 72*25 },
+    { objectName: "block_square", x: 72*14 - 36,  y: 72*28 },
+    { objectName: "block_square", x: 72*12 - 36,  y: 72*32 },
+    { objectName: "block_square", x: 72*10 - 36,  y: 72*37 },
 
     
     { objectName: "circle_collectible_1", x: 400,  y: 200 },
