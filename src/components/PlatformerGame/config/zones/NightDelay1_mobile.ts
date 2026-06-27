@@ -57,6 +57,12 @@ const zone_overworld = {
   ],
 
   objects: [
+    { objectName: "block_square", x: 0,  y: 800 },
+    { objectName: "block_square", x: 100,  y: 800 },
+    { objectName: "block_square", x: 200,  y: 800 },
+    { objectName: "block_square", x: 300,  y: 800 },
+
+
     { objectName: "block_square", x: 300,  y: 300 },
     { objectName: "block_square", x: 400,  y: 300 },
     { objectName: "block_square", x: 500,  y: 300 },
